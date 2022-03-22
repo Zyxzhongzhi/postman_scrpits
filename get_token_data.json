@@ -1,0 +1,9 @@
+[
+	{"grant_type":"client_credential","appid":"wxf79074a40755f76d","secret":"f5e03dc442f1b0a0f967c7a9208c077f"},
+	{"grant_type":"","appid":"wxf79074a40755f76d","secret":"f5e03dc442f1b0a0f967c7a9208c077f"},
+	{"grant_type":"client_credential","appid":"","secret":"f5e03dc442f1b0a0f967c7a9208c077f"},
+	{"grant_type":"client_credential","appid":"wxf79074a40755f76d","secret":""}
+]
+
+
+

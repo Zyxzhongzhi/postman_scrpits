@@ -1,0 +1,291 @@
+{
+	"info": {
+		"_postman_id": "c4dccf21-0478-4815-ac66-4b28cac08163",
+		"name": "微信公众号",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "获取Access token接口",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"/*\r",
+							"//第一种提取方式\r",
+							"console.log(\"打印\");\r",
+							"console.log(responseBody);\r",
+							"//返回的json字符串转换成对象\r",
+							"var jsonObj = JSON.parse(responseBody); \r",
+							"//从对象中取出access_token的值，并设置全局变量\r",
+							"console.log(jsonObj.access_token);\r",
+							"pm.globals.set(\"access_token\", jsonObj.access_token);\r",
+							"*/\r",
+							"//第二种提取方式\r",
+							"//1、通过返回的结果匹配一个正则表达式取得需要的值\r",
+							"\r",
+							"\r",
+							"/*\r",
+							"var content_type = postman.getResponseHeader(\"Content-Type\");\r",
+							"console.log(content_type);\r",
+							"\r",
+							"var cookie = postman.getResponseCookies(\"\");\r",
+							"\r",
+							"var jsonObject = xml2Json(responseBody);\r",
+							"\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"*/\r",
+							"\r",
+							"if(responseBody.search(\"access_token\")!=-1){\r",
+							"    var datas = responseBody.match(new RegExp('\"access_token\":\"(.*?)\"'));\r",
+							"    pm.globals.set(\"access_token\", datas[1]);\r",
+							"    pm.test(\"Body matches string\", function () {\r",
+							"        pm.expect(pm.response.text()).to.include(\"access_token\");\r",
+							"});\r",
+							"}\r",
+							"\r",
+							"\r",
+							"/*pm.test(\"检查expires_in的值是7200\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.expires_in).to.eql(7200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Successful POST request\", function () {\r",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 202]);\r",
+							"});\r",
+							"*/"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{url}}/cgi-bin/token?grant_type={{grant_type}}&appid={{appid}}&secret={{secret}}",
+					"protocol": "https",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"cgi-bin",
+						"token"
+					],
+					"query": [
+						{
+							"key": "grant_type",
+							"value": "{{grant_type}}"
+						},
+						{
+							"key": "appid",
+							"value": "{{appid}}"
+						},
+						{
+							"key": "secret",
+							"value": "{{secret}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "获取公众号已创建的标签接口",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{url}}/cgi-bin/tags/get?access_token={{access_token}}",
+					"protocol": "https",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"cgi-bin",
+						"tags",
+						"get"
+					],
+					"query": [
+						{
+							"key": "access_token",
+							"value": "{{access_token}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "创建标签接口",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"//自定义动态参数时间戳\r",
+							"var current_time = Date.now();\r",
+							"//设置全局变量\r",
+							"pm.globals.set(\"current_time\", current_time);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Body matches string\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"广东\"+pm.globals.get(\"current_time\"));\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"tag\": {\"name\": \"广东{{current_time}}\"}} ",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{url}}/cgi-bin/tags/create?access_token={{access_token}}",
+					"protocol": "https",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"cgi-bin",
+						"tags",
+						"create"
+					],
+					"query": [
+						{
+							"key": "access_token",
+							"value": "{{access_token}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "文件上传接口",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "media",
+							"type": "file",
+							"src": "/D:/D桌面/案例：园区工作台images/企企通-1.png"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://{{url}}/cgi-bin/media/uploadimg?access_token={{access_token}}",
+					"protocol": "https",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"cgi-bin",
+						"media",
+						"uploadimg"
+					],
+					"query": [
+						{
+							"key": "access_token",
+							"value": "{{access_token}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "test",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var random_num = Math.floor(Math.random()*100);\r",
+							"console.log(random_num);\r",
+							"pm.globals.set(\"randomint\", random_num);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"tag\": {\"name\": \"广东{{randomint}}\"}} ",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{url}}/cgi-bin/tags/create?access_token={{access_token}}",
+					"protocol": "https",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"cgi-bin",
+						"tags",
+						"create"
+					],
+					"query": [
+						{
+							"key": "access_token",
+							"value": "{{access_token}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"pm.test(\"Status code is 200\", function () {",
+					"    pm.response.to.have.status(200);",
+					"});"
+				]
+			}
+		}
+	]
+}
